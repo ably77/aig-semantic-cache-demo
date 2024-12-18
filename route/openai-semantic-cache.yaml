@@ -14,7 +14,7 @@ spec:
         datastore:
           redis:
             connectionString: redis://redis-cache:6379
-            scoreThreshold: 0.95
+            scoreThreshold: 0.1
         embedding:
           openai:
             authToken:

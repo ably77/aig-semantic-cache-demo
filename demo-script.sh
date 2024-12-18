@@ -5,6 +5,9 @@ export AIGW_PORT="8080"
 echo "Starting the Gloo AI Gateway Semantic Cache Demo..."
 echo
 
+# clear cache
+kubectl delete pods -n gloo-system -l app=redis-cache >/dev/null 2>&1
+
 # Step 1: Configure a simple route to openai LLM backend
 read -p "Step 1: Configure a simple route to openai LLM backend. Press enter to proceed..."
 kubectl create secret generic openai-secret -n gloo-system \
@@ -50,31 +53,37 @@ while true; do
 done
 
 # Step 4: Test OpenAI endpoint with service mesh prompt
+#echo
+#echo "Testing OpenAI endpoint with service mesh prompt."
+#
+#while true; do
+#  read -p "Press Enter to send a request, or type 'next' to move on: " user_input
+#  if [[ "$user_input" == "next" ]]; then
+#    echo "Exiting test."
+#    break
+#  fi
+#
+#  echo "Sending request to OpenAI endpoint..."
+#  curl -i http://$GATEWAY_IP:$AIGW_PORT/openai -H "Content-Type: application/json" -d '{
+#      "model": "gpt-4o-mini",
+#      "messages": [
+#        {
+#          "role": "system",
+#          "content": "You are a solutions architect for Kubernetes networking, skilled in explaining complex technical concepts surrounding API Gateway, Service Mesh, and CNI"
+#        },
+#        {
+#          "role": "user",
+#          "content": "Write me a 20-word pitch on why I should use a service mesh in my Kubernetes cluster"
+#        }
+#      ]
+#    }'
+#  echo
+#  echo "Responses should come from gpt-4o-mini model."
+#  echo
+#done
+
+# Step 12: Cleanup
+read -p "Step 12: Cleanup demo resources. Press enter to proceed..."
+kubectl delete -f route
+echo "Cleanup completed."
 echo
-echo "Testing OpenAI endpoint with service mesh prompt."
-
-while true; do
-  read -p "Press Enter to send a request, or type 'next' to move on: " user_input
-  if [[ "$user_input" == "next" ]]; then
-    echo "Exiting test."
-    break
-  fi
-
-  echo "Sending request to OpenAI endpoint..."
-  curl -i http://$GATEWAY_IP:$AIGW_PORT/openai -H "Content-Type: application/json" -d '{
-      "model": "gpt-4o-mini",
-      "messages": [
-        {
-          "role": "system",
-          "content": "You are a solutions architect for Kubernetes networking, skilled in explaining complex technical concepts surrounding API Gateway, Service Mesh, and CNI"
-        },
-        {
-          "role": "user",
-          "content": "Write me a 20-word pitch on why I should use a service mesh in my Kubernetes cluster"
-        }
-      ]
-    }'
-  echo
-  echo "Responses should come from gpt-4o-mini model."
-  echo
-done
