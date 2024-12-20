@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export GLOO_VERSION="1.18.0-rc4"
+export GLOO_VERSION="1.18.0-rc1"
 
 # Use the GLOO_LICENSE_KEY environment variable if set, otherwise prompt the user
 if [[ -z "$GLOO_LICENSE_KEY" ]]; then
@@ -66,5 +66,12 @@ echo "### Checking AI Gateway proxy components..."
 sleep 5
 kubectl wait deploy/gloo-proxy-ai-gateway -n gloo-system \
     --for=condition=Available --timeout=120s
+
+#echo "### Installing Ollama deployment..."
+#kubectl apply -f ollama-deploy
+#
+#echo "### Checking Ollama deployment..."
+#kubectl wait deploy/ollama-qwen -n ollama \
+#    --for=condition=Available --timeout=600s
 
 echo "### Setup complete!"
