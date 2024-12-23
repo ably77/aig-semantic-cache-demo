@@ -1,6 +1,62 @@
 #!/bin/bash
 
-export AIGW_PORT="8080"
+# Prompt the user for protocol with predefined options
+echo "Select the protocol:"
+echo "1) http"
+echo "2) https"
+read -p "Enter your choice: " PROTOCOL_CHOICE
+
+case $PROTOCOL_CHOICE in
+  1|"")
+    PROTOCOL="http"
+    ;;
+  2)
+    PROTOCOL="https"
+    ;;
+  *)
+    echo "Invalid choice. Defaulting to http."
+    PROTOCOL="http"
+    ;;
+esac
+
+# Prompt the user for port with predefined options
+echo
+echo "Select the port:"
+if [ "$PROTOCOL" == "http" ]; then
+  echo "1) 8080 (default)"
+elif [ "$PROTOCOL" == "https" ]; then
+  echo "1) 443 (default)"
+fi
+echo "2) Custom"
+
+read -p "Enter your choice: " PORT_CHOICE
+
+case $PORT_CHOICE in
+  1|"")
+    if [ "$PROTOCOL" == "http" ]; then
+      AIGW_PORT="8080"
+    elif [ "$PROTOCOL" == "https" ]; then
+      AIGW_PORT="443"
+    fi
+    ;;
+  2)
+    read -p "Enter your custom port: " CUSTOM_PORT
+    AIGW_PORT=$CUSTOM_PORT
+    ;;
+  *)
+    echo "Invalid choice. Defaulting to the protocol's default port."
+    if [ "$PROTOCOL" == "http" ]; then
+      AIGW_PORT="8080"
+    elif [ "$PROTOCOL" == "https" ]; then
+      AIGW_PORT="443"
+    fi
+    ;;
+esac
+
+echo
+echo "Using protocol: $PROTOCOL"
+echo "Using port: $AIGW_PORT"
+echo
 
 echo "Starting the Gloo AI Gateway Semantic Cache Demo..."
 echo
@@ -38,7 +94,7 @@ while true; do
   fi
 
   echo "Sending request to OpenAI endpoint..."
-  curl -i http://$GATEWAY_IP:$AIGW_PORT/openai -H "Content-Type: application/json" -d '{
+  curl -ik $PROTOCOL://$GATEWAY_IP:$AIGW_PORT/openai -H "Content-Type: application/json" -d '{
       "model": "gpt-4o-mini",
       "messages": [
         {
@@ -64,7 +120,7 @@ done
 #  fi
 #
 #  echo "Sending request to OpenAI endpoint..."
-#  curl -i http://$GATEWAY_IP:$AIGW_PORT/openai -H "Content-Type: application/json" -d '{
+#  curl -ik $PROTOCOL://$GATEWAY_IP:$AIGW_PORT/openai -H "Content-Type: application/json" -d '{
 #      "model": "gpt-4o-mini",
 #      "messages": [
 #        {
